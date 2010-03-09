@@ -1,0 +1,22 @@
+form .aligned .treeview {
+  clear: left; 
+}
+
+form .aligned .treeview ul,
+form .aligned .treeview li {
+  list-style-type: none;
+}
+
+form .aligned .treeview ul {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+fieldset.module.categories {
+  float: right;
+  margin-left: 1em;
+}
+
+.submit-row {
+  clear: right;
+}
