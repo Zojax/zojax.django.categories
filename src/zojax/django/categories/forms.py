@@ -1,9 +1,28 @@
 from django import forms
 from django.core.validators import EMPTY_VALUES
-from django.utils.safestring import mark_safe
-from zojax.django.categories.models import Category
+from django.forms.models import ModelForm, ModelChoiceField
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
+from zojax.django.categories.models import Category
 
+
+class CategoryChoiceField(ModelChoiceField):
+    
+    def label_from_instance(self, obj):
+        label = super(CategoryChoiceField, self).label_from_instance(obj)
+        label = "-" * obj.level + " " + label
+        return label
+
+
+class CategoryAdminForm(ModelForm):
+    
+    parent = CategoryChoiceField(Category.objects.all(), label=_("Parent category"))
+    
+    class Meta:
+        model = Category
+        fields = ('title', 'parent')        
+    
 
 class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
     

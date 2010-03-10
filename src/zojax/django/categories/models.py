@@ -66,7 +66,7 @@ class Category(models.Model):
         return self.title
 
 
-mptt.register(Category)
+mptt.register(Category, order_insertion_by=['title'])
 
 
 class CategorizedItemManager(models.Manager):
