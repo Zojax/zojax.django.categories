@@ -28,7 +28,7 @@ setup(name='zojax.django.categories',
       install_requires=[
           'setuptools',
           'django-autoslug',
-          'feincms==1.0.4',
+          'feincms',
           'zojax.django.jquery',
           'django-form-utils',
           # -*- Extra requirements: -*-
