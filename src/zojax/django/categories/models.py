@@ -71,7 +71,7 @@ mptt.register(Category, order_insertion_by=['title'])
 
 class CategorizedItemManager(models.Manager):
     
-    def get_by_model(self, queryset_or_model, categories):
+    def get_by_model(self, queryset_or_model, categories, union=False):
         """
         Create a ``QuerySet`` containing instances of the specified
         model associated with a given category or list of categories.
@@ -86,7 +86,10 @@ class CategorizedItemManager(models.Manager):
             # query below.
             category = categories[0]
         else:
-            return self.get_intersection_by_model(queryset_or_model, categories)
+            if union:
+                return self.get_union_by_model(queryset_or_model, categories)
+            else:
+                return self.get_intersection_by_model(queryset_or_model, categories)
 
         queryset, model = get_queryset_and_model(queryset_or_model)
         content_type = ContentType.objects.get_for_model(model)
