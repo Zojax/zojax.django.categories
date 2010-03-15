@@ -49,6 +49,122 @@ class CategoryManager(models.Manager):
                            items__object_id=obj.pk)
 
 
+    def _get_usage(self, model, counts=False, min_count=None, extra_joins=None, extra_criteria=None, params=None):
+        """
+        Perform the custom SQL query for ``usage_for_model`` and
+        ``usage_for_queryset``.
+        """
+        if min_count is not None: counts = True
+
+        model_table = qn(model._meta.db_table)
+        model_pk = '%s.%s' % (model_table, qn(model._meta.pk.column))
+        query = """
+        SELECT DISTINCT %(category)s.id, %(category)s.title,
+            %(category)s.slug, %(category)s.parent_id,
+            %(category)s.id, %(category)s.lft,
+            %(category)s.rght, %(category)s.tree_id,
+            %(category)s.level %(count_sql)s
+        FROM
+            %(category)s
+            INNER JOIN %(categorized_item)s
+                ON %(category)s.id = %(categorized_item)s.category_id
+            INNER JOIN %(model)s
+                ON %(categorized_item)s.object_id = %(model_pk)s
+            %%s
+        WHERE %(categorized_item)s.content_type_id = %(content_type_id)s
+            %%s
+        GROUP BY %(category)s.id, %(category)s.title,
+            %(category)s.slug, %(category)s.parent_id,
+            %(category)s.id, %(category)s.lft,
+            %(category)s.rght, %(category)s.tree_id,
+            %(category)s.level
+        %%s
+        ORDER BY %(category)s.tree_id ASC, %(category)s.lft""" % {
+            'category': qn(self.model._meta.db_table),
+            'count_sql': counts and (', COUNT(%s)' % model_pk) or '',
+            'categorized_item': qn(CategorizedItem._meta.db_table),
+            'model': model_table,
+            'model_pk': model_pk,
+            'content_type_id': ContentType.objects.get_for_model(model).pk,
+        }
+
+
+        min_count_sql = ''
+        if min_count is not None:
+            min_count_sql = 'HAVING COUNT(%s) >= %%s' % model_pk
+            params.append(min_count)
+
+        cursor = connection.cursor()
+        
+        cursor.execute(query % (extra_joins, extra_criteria, min_count_sql), params)
+        categories = []
+        for row in cursor.fetchall():
+            t = self.model(*row[:8])
+            if counts:
+                t.count = row[-1]
+            categories.append(t)
+        return categories
+
+    def usage_for_model(self, model, counts=False, min_count=None, filters=None):
+        """
+        Obtain a list of categories associated with instances of the given
+        Model class.
+
+        If ``counts`` is True, a ``count`` attribute will be added to
+        each category, indicating how many times it has been used against
+        the Model class in question.
+
+        If ``min_count`` is given, only categories which have a ``count``
+        greater than or equal to ``min_count`` will be returned.
+        Passing a value for ``min_count`` implies ``counts=True``.
+
+        To limit the categories (and counts, if specified) returned to those
+        used by a subset of the Model's instances, pass a dictionary
+        of field lookups to be applied to the given Model as the
+        ``filters`` argument.
+        """
+        if filters is None: filters = {}
+
+        queryset = model._default_manager.filter()
+        for f in filters.items():
+            queryset.query.add_filter(f)
+        usage = self.usage_for_queryset(queryset, counts, min_count)
+
+        return usage
+
+    def usage_for_queryset(self, queryset, counts=False, min_count=None):
+        """
+        Obtain a list of categories associated with instances of a model
+        contained in the given queryset.
+
+        If ``counts`` is True, a ``count`` attribute will be added to
+        each category, indicating how many times it has been used against
+        the Model class in question.
+
+        If ``min_count`` is given, only categories which have a ``count``
+        greater than or equal to ``min_count`` will be returned.
+        Passing a value for ``min_count`` implies ``counts=True``.
+        """
+
+        if getattr(queryset.query, 'get_compiler', None):
+            # Django 1.2+
+            compiler = queryset.query.get_compiler(using='default')
+            extra_joins = ' '.join(compiler.get_from_clause()[0][1:])
+            where, params = queryset.query.where.as_sql(
+                compiler.quote_name_unless_alias, compiler.connection
+            )
+        else:
+            # Django pre-1.2
+            extra_joins = ' '.join(queryset.query.get_from_clause()[0][1:])
+            where, params = queryset.query.where.as_sql()
+
+        if where:
+            extra_criteria = 'AND %s' % where
+        else:
+            extra_criteria = ''
+        return self._get_usage(queryset.model, counts, min_count, extra_joins, extra_criteria, params)
+
+
 class Category(models.Model):
     
     title = models.CharField(max_length=200, verbose_name=_(u"Title"))
