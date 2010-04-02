@@ -88,7 +88,6 @@ class CategoryManager(models.Manager):
             'content_type_id': ContentType.objects.get_for_model(model).pk,
         }
 
-
         min_count_sql = ''
         if min_count is not None:
             min_count_sql = 'HAVING COUNT(%s) >= %%s' % model_pk
@@ -197,31 +196,11 @@ class CategorizedItemManager(models.Manager):
             # No existing categories were given
             queryset, model = get_queryset_and_model(queryset_or_model)
             return model._default_manager.none()
-        elif categories_count == 1:
-            # Optimisation for single category - fall through to the simpler
-            # query below.
-            category = categories[0]
         else:
             if union:
                 return self.get_union_by_model(queryset_or_model, categories)
             else:
                 return self.get_intersection_by_model(queryset_or_model, categories)
-
-        queryset, model = get_queryset_and_model(queryset_or_model)
-        content_type = ContentType.objects.get_for_model(model)
-        opts = self.model._meta
-        categorized_item_table = qn(opts.db_table)
-        return queryset.extra(
-            tables=[opts.db_table],
-            where=[
-                '%s.content_type_id = %%s' % categorized_item_table,
-                '%s.category_id = %%s' % categorized_item_table,
-                '%s.%s = %s.object_id' % (qn(model._meta.db_table),
-                                          qn(model._meta.pk.column),
-                                          categorized_item_table)
-            ],
-            params=[content_type.pk, category.pk],
-        )
 
     def get_intersection_by_model(self, queryset_or_model, categories):
         """
