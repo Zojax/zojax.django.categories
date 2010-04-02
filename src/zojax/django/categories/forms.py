@@ -17,7 +17,7 @@ class CategoryChoiceField(ModelChoiceField):
 
 class CategoryAdminForm(ModelForm):
     
-    parent = CategoryChoiceField(Category.objects.all(), label=_("Parent category"))
+    parent = CategoryChoiceField(Category.objects.all(), label=_("Parent category"), required=False)
     
     class Meta:
         model = Category
