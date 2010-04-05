@@ -3,6 +3,7 @@ from django.core.validators import EMPTY_VALUES
 from django.forms.models import ModelForm, ModelChoiceField
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from zojax.django.categories.models import Category
 
@@ -28,7 +29,22 @@ class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
     
     input_type = "hidden"
     template = "categories/treewidget.html" 
-    
+
+    class Media:
+        
+        js = ('jquery/treeview/jquery.treeview.js',
+              'categories/treewidget.js',)
+        
+        css = ('jquery/treeview/jquery.treeview.css',)
+        
+    class Media:
+                css = {
+                        'all': ('%sjquery/treeview/jquery.treeview.css' % settings.MEDIA_URL,)
+                }
+                js = ('%sjquery/treeview/jquery.treeview.js' % settings.MEDIA_URL,
+                      '%scategories/treewidget.js' % settings.MEDIA_URL,
+                )
+        
     def render(self, name, value, attrs=None):
         if not value:
             value = value
@@ -38,6 +54,7 @@ class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
                                                           'name': name,
                                                           'value': value,
                                                           'root_categories': root_categories}))
+
 
 
 class CategoriesField(forms.Field):
