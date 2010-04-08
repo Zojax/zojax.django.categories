@@ -31,13 +31,6 @@ class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
     template = "categories/treewidget.html" 
 
     class Media:
-        
-        js = ('%sjquery/treeview/jquery.treeview.js' % settings.MEDIA_URL,
-              '%scategories/treewidget.js' % settings.MEDIA_URL,)
-        
-        css = ('%sjquery/treeview/jquery.treeview.css' % settings.MEDIA_URL,)
-        
-    class Media:
                 css = {
                         'all': ('%sjquery/treeview/jquery.treeview.css' % settings.MEDIA_URL,)
                 }
