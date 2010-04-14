@@ -339,7 +339,7 @@ class CategorizedItemManager(models.Manager):
 class CategorizedItem(models.Model):
     category = models.ForeignKey(Category, verbose_name=_('category'), related_name='items')
     content_type = models.ForeignKey(ContentType, verbose_name=_('content type'))
-    object_id    = models.PositiveIntegerField(_('object id'), db_index=True)
+    object_id    = models.BigIntegerField(_('object id'), db_index=True)
     object       = generic.GenericForeignKey('content_type', 'object_id')
 
     objects = CategorizedItemManager()
