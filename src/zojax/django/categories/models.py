@@ -94,7 +94,6 @@ class CategoryManager(models.Manager):
             params.append(min_count)
 
         cursor = connection.cursor()
-        
         cursor.execute(query % (extra_joins, extra_criteria, min_count_sql), params)
         categories = []
         for row in cursor.fetchall():
@@ -180,6 +179,15 @@ class Category(models.Model):
     def __unicode__(self):
         return self.title
 
+    def count(self):
+        return CategorizedItem.objects.filter(category__in=list(self.get_children())+[self]).count()
+
+    def get_children(self, child=None):
+        if child is None:
+            child = self
+        for child in self.objects.filter(parent=child):
+            for child in self.get_children(child):
+                yield child
 
 mptt.register(Category, order_insertion_by=['title'])
 
