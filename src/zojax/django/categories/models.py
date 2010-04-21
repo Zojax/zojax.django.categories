@@ -188,6 +188,12 @@ class Category(models.Model):
         for child in self.objects.filter(parent=child):
             for child in self.get_children(child):
                 yield child
+                
+    def get_parents(self):
+        if self.parent:
+            yield self.parent
+            for i in self.parent.get_parents():
+                yield i
 
 mptt.register(Category, order_insertion_by=['title'])
 
