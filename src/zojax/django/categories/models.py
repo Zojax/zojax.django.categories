@@ -1,16 +1,17 @@
 from autoslug.fields import AutoSlugField
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.db import models, connection
 from django.utils.translation import ugettext_lazy as _
 from zojax.django.categories.utils import get_queryset_and_model
 import mptt
-
+from zojax.django.contentitem.models import CurrentSiteManager, CurrentSiteModelMixin
 
 qn = connection.ops.quote_name
 
 
-class CategoryManager(models.Manager):
+class CategoryManager(CurrentSiteManager):
     
     def update_categories(self, obj, categories):
         """
@@ -163,12 +164,12 @@ class CategoryManager(models.Manager):
         return self._get_usage(queryset.model, counts, min_count, extra_joins, extra_criteria, params)
 
 
-class Category(models.Model):
+class Category(CurrentSiteModelMixin, models.Model):
     
     title = models.CharField(max_length=200, verbose_name=_(u"Title"))
     slug = AutoSlugField(populate_from='title', verbose_name=_(u"Slug"), always_update=True)
     parent = models.ForeignKey('self', null=True, blank=True, verbose_name=_(u"Parent category"))
-    
+    sites = models.ManyToManyField(Site, blank=True, related_name='category_sites')
     objects = CategoryManager()
     
     class Meta:
@@ -193,7 +194,7 @@ class Category(models.Model):
         if self.parent:
             yield self.parent
             for i in self.parent.get_parents():
-                yield i
+                yield i  
 
 mptt.register(Category, order_insertion_by=['title'])
 
