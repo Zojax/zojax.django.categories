@@ -197,7 +197,7 @@ class Category(CurrentSiteModelMixin, models.Model):
                 yield i  
 
 mptt.register(Category, order_insertion_by=['title'])
-
+Category._tree_manager.__class__.__bases__ = (CurrentSiteManager,) + Category._tree_manager.__class__.__bases__
 
 class CategorizedItemManager(models.Manager):
     
