@@ -26,7 +26,7 @@ class Migration(SchemaMigration):
             ('category', self.gf('django.db.models.fields.related.ForeignKey')(related_name='items', to=orm['categories.Category'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('object_id', self.gf('django.db.models.fields.PositiveIntegerField')(db_index=True)),
+            ('object_id', self.gf('django.db.models.fields.BigIntegerField')(db_index=True)),
         ))
         db.send_create_signal('categories', ['CategorizedItem'])
 
@@ -52,7 +52,7 @@ class Migration(SchemaMigration):
             'category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'items'", 'to': "orm['categories.Category']"}),
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'})
+            'object_id': ('django.db.models.fields.BigIntegerField', [], {'db_index': 'True'})
         },
         'categories.category': {
             'Meta': {'object_name': 'Category'},

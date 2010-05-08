@@ -22,7 +22,7 @@ class CategoryAdminForm(ModelForm):
     
     class Meta:
         model = Category
-        fields = ('title', 'parent', 'sites')        
+        fields = ('title', 'parent', )        
     
 
 class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
