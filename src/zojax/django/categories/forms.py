@@ -31,12 +31,14 @@ class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
     template = "categories/treewidget.html" 
 
     class Media:
-                css = {
-                        'all': ('%sjquery/treeview/jquery.treeview.css' % settings.MEDIA_URL,)
-                }
-                js = ('%sjquery/treeview/jquery.treeview.js' % settings.MEDIA_URL,
-                      '%scategories/treewidget.js' % settings.MEDIA_URL,
-                )
+        css = {
+          'screen': ('%sjquery/treeview/jquery.treeview.css' % settings.MEDIA_URL, )
+        }
+        js = (
+          '%sjquery/jquery-1.4.js' % settings.MEDIA_URL,
+          '%sjquery/treeview/jquery.treeview.js' % settings.MEDIA_URL,
+          '%scategories/treewidget.js' % settings.MEDIA_URL,
+        )
         
     def render(self, name, value, attrs=None):
         if not value:

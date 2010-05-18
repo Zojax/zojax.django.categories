@@ -8,7 +8,7 @@
   {% else %}
    </li>
    <li>{% endif %}
-  <input type="checkbox" name="{{ name }}" value="{{ category.id }}" id="id_{{ name }}_{{ category.id }}" {% if category in value %}checked="checked"{% endif %}></input><label for="id_{{ name }}_{{ category.id }}" class="vCheckboxLabel">{{ category }}</label>
+  <input type="checkbox" name="{{ name }}" value="{{ category.id }}" id="id_{{ name }}_{{ category.id }}" {% if category in value %}checked="checked"{% endif %} /><label for="id_{{ name }}_{{ category.id }}" class="vCheckboxLabel">{{ category }}</label>
   {% for level in structure.closed_levels %}
     </li>
   </ul>
