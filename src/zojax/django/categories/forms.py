@@ -9,7 +9,7 @@ from zojax.django.categories.models import Category
 
 
 class CategoryChoiceField(ModelChoiceField):
-    
+
     def label_from_instance(self, obj):
         label = super(CategoryChoiceField, self).label_from_instance(obj)
         label = "-" * obj.level + " " + label
@@ -17,29 +17,28 @@ class CategoryChoiceField(ModelChoiceField):
 
 
 class CategoryAdminForm(ModelForm):
-    
+
     parent = CategoryChoiceField(Category.objects.all(), label=_("Parent category"), required=False)
-    
+
     class Meta:
         model = Category
-        fields = ('title', 'parent', )        
-    
+        fields = ('title', 'parent', )
+
 
 class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
-    
+
     input_type = "hidden"
-    template = "categories/treewidget.html" 
+    template = "categories/treewidget.html"
 
     class Media:
         css = {
           'screen': ('%sjquery/treeview/jquery.treeview.css' % settings.MEDIA_URL, )
         }
         js = (
-          '%sjquery/jquery-1.4.js' % settings.MEDIA_URL,
           '%sjquery/treeview/jquery.treeview.js' % settings.MEDIA_URL,
           '%scategories/treewidget.js' % settings.MEDIA_URL,
         )
-        
+
     def render(self, name, value, attrs=None):
         if not value:
             value = value
@@ -51,12 +50,19 @@ class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
                                                           'root_categories': root_categories}))
 
 
+class CategoriesTreeAdminWidget(CategoriesTreeWidget):
+
+    class Media(CategoriesTreeWidget.Media):
+        js = (
+          '%sjquery/jquery-1.4.js' % settings.MEDIA_URL,
+        ) + CategoriesTreeWidget.Media.js
+
 
 class CategoriesField(forms.Field):
-    
+
     widget = CategoriesTreeWidget
-    
-    def clean(self, value):        
+
+    def clean(self, value):
         if self.required and value in EMPTY_VALUES:
             raise forms.ValidationError(self.error_messages['required'])
         try:
@@ -66,4 +72,8 @@ class CategoriesField(forms.Field):
         return values
 
 
-    
+class CategoriesAdminField(CategoriesField):
+
+    widget = CategoriesTreeAdminWidget
+
+
