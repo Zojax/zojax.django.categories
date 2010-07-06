@@ -25,10 +25,23 @@ class CategoryAdminForm(ModelForm):
         fields = ('title', 'parent', )
 
 
-class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
+class BaseCategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
 
     input_type = "hidden"
     template = "categories/treewidget.html"
+
+    def render(self, name, value, attrs=None):
+        if not value:
+            value = value
+        widget = super(BaseCategoriesTreeWidget, self).render(name, value, attrs=None)
+        root_categories = Category.objects.filter(parent=None)
+        return mark_safe(render_to_string(self.template, {'widget': widget,
+                                                          'name': name,
+                                                          'value': value,
+                                                          'root_categories': root_categories}))
+
+
+class CategoriesTreeWidget(BaseCategoriesTreeWidget):
 
     class Media:
         css = {
@@ -39,28 +52,22 @@ class CategoriesTreeWidget(forms.widgets.CheckboxSelectMultiple):
           '%scategories/treewidget.js' % settings.MEDIA_URL,
         )
 
-    def render(self, name, value, attrs=None):
-        if not value:
-            value = value
-        widget = super(CategoriesTreeWidget, self).render(name, value, attrs=None)
-        root_categories = Category.objects.filter(parent=None)
-        return mark_safe(render_to_string(self.template, {'widget': widget,
-                                                          'name': name,
-                                                          'value': value,
-                                                          'root_categories': root_categories}))
 
+class CategoriesTreeAdminWidget(BaseCategoriesTreeWidget):
 
-class CategoriesTreeAdminWidget(CategoriesTreeWidget):
-
-    class Media(CategoriesTreeWidget.Media):
+    class Media:
+        css = {
+          'screen': ('%sjquery/treeview/jquery.treeview.css' % settings.MEDIA_URL, )
+        }
         js = (
           '%sjquery/jquery-1.4.js' % settings.MEDIA_URL,
-        ) + CategoriesTreeWidget.Media.js
+          '%sjquery/treeview/jquery.treeview.js' % settings.MEDIA_URL,
+          '%scategories/treewidget.js' % settings.MEDIA_URL,
+        )
 
 
 class CategoriesField(forms.Field):
 
-    widget = CategoriesTreeWidget
 
     def clean(self, value):
         if self.required and value in EMPTY_VALUES:
