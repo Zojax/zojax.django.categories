@@ -38,7 +38,6 @@ def register(model, category_descriptor_attr='categories',
 
     # Add category descriptor
     setattr(model, category_descriptor_attr, CategoryDescriptor())
-
     # Add custom manager
     ModelCategorizedItemManager().contribute_to_class(model, categorized_item_manager_attr)
 

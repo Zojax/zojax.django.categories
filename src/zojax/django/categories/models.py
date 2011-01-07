@@ -165,6 +165,7 @@ class CategoryManager(models.Manager):
 class Category(models.Model):
     
     title = models.CharField(max_length=200, verbose_name=_(u"Title"))
+    description = models.TextField(null=True, blank=True)
     slug = AutoSlugField(populate_from='title', verbose_name=_(u"Slug"), always_update=True)
     parent = models.ForeignKey('self', null=True, blank=True, verbose_name=_(u"Parent category"))
     objects = CategoryManager()
