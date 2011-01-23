@@ -1,0 +1,17 @@
+{% load mptt_tags %}
+<div id="categories-tree-{{name}}" class="categories-tree">
+{% full_tree_for_model categories.Category as categories %}
+{% for category,structure in categories|tree_info %}
+  {% if structure.new_level %}
+    <ul>
+      <li>
+  {% else %}
+   </li>
+   <li>{% endif %}
+  <input type="checkbox" name="{{ name }}" value="{{ category.id }}" id="id_{{ name }}_{{ category.id }}" {% if category in value %}checked="checked"{% endif %} /><label for="id_{{ name }}_{{ category.id }}" class="vCheckboxLabel">{{ category }}</label>
+  {% for level in structure.closed_levels %}
+    </li>
+  </ul>
+  {% endfor %}
+{% endfor %}
+</div>
