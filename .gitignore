@@ -1,0 +1,14 @@
+*.bat
+*.orig
+*.pyc
+*.sh
+*.sql
+.DS_Store
+.project
+.pydevproject
+.pydevproject.bak
+.settings
+.idea
+.svn/
+commit.txt
+.installed.cfg
