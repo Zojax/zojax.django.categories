@@ -45,11 +45,11 @@ class CategoriesTreeWidget(BaseCategoriesTreeWidget):
 
     class Media:
         css = {
-          'screen': ('%sjquery/treeview/jquery.treeview.css' % settings.MEDIA_URL, )
+          'screen': ('%sjquery/treeview/jquery.treeview.css' % settings.STATIC_URL, )
         }
         js = (
-          '%sjquery/treeview/jquery.treeview.js' % settings.MEDIA_URL,
-          '%scategories/treewidget.js' % settings.MEDIA_URL,
+          '%sjquery/treeview/jquery.treeview.js' % settings.STATIC_URL,
+          '%scategories/treewidget.js' % settings.STATIC_URL,
         )
 
 
@@ -57,12 +57,12 @@ class CategoriesTreeAdminWidget(BaseCategoriesTreeWidget):
 
     class Media:
         css = {
-          'screen': ('%sjquery/treeview/jquery.treeview.css' % settings.MEDIA_URL, )
+          'screen': ('%sjquery/treeview/jquery.treeview.css' % settings.STATIC_URL, )
         }
         js = (
-          '%sjquery/jquery-1.4.js' % settings.MEDIA_URL,
-          '%sjquery/treeview/jquery.treeview.js' % settings.MEDIA_URL,
-          '%scategories/treewidget.js' % settings.MEDIA_URL,
+          '%sjquery/jquery-1.4.js' % settings.STATIC_URL,
+          '%sjquery/treeview/jquery.treeview.js' % settings.STATIC_URL,
+          '%scategories/treewidget.js' % settings.STATIC_URL,
         )
 
 
