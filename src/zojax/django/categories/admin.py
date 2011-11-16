@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db import models
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList
@@ -30,8 +31,15 @@ admin.site.register(Category, CategoryAdmin)
 
 class CategoriesFilterSpec(FilterSpec):
 
-    def __init__(self, request, params, model, model_admin):
-        super(CategoriesFilterSpec, self).__init__(None, request, params, model, model_admin)
+    def __init__(self, f, request, params, model, model_admin, field_path=None):
+        self.field = f
+        self.params = params
+        self.field_path = field_path
+        if field_path is None:
+            if isinstance(f, models.related.RelatedObject):
+                self.field_path = f.var_name
+            else:
+                self.field_path = getattr(f,'name', None)
         self.lookup_kwarg = "category"
         self.model = model
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
@@ -60,7 +68,7 @@ class ChangeListWithCategories(ChangeList):
 
     def get_filters(self, request):
         filter_specs, has_filters = super(ChangeListWithCategories, self).get_filters(request)
-        filter_specs.append(CategoriesFilterSpec(request, self.params, self.model, self.model_admin))
+        filter_specs.append(CategoriesFilterSpec(None, request, self.params, self.model, self.model_admin))
         return filter_specs, bool(filter_specs)
         
     def get_query_set(self):
