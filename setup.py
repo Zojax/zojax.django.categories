@@ -31,6 +31,7 @@ setup(name='zojax.django.categories',
           'feincms',
           'zojax.django.jquery',
           'django-form-utils',
+          'zojax.django.contentitem'
           # -*- Extra requirements: -*-
       ],
       entry_points="""
