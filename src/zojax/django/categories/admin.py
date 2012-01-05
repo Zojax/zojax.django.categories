@@ -14,6 +14,7 @@ class CategoryInline(admin.TabularInline):
     model = Category
     verbose_name = _("Sub-category")
     verbose_name_plural = _("Sub-categories")
+    extra = 0
     
 
 class CategoryAdmin(editor.TreeEditor):
